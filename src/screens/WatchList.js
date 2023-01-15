@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import "../App.css";
 import styled from "styled-components";
@@ -7,8 +7,8 @@ import { Typography, Container, Button } from "@mui/material";
 import LockIcon from "@mui/icons-material/Lock";
 import { Box } from "@mui/system";
 import MovieComponent from "../components/MovieComponent";
-import { useAuth0 } from "@auth0/auth0-react";
 import { useNavigate } from "react-router-dom";
+import { checkUser, getCurrentUser } from "../config/firebasemethods";
 
 const SearchBar = styled.div`
   display: flex;
@@ -42,10 +42,33 @@ const MovieListContainer = styled.div`
 `;
 
 function WatchList() {
-  const { user, isAuthenticated, isLoading } = useAuth0();
-  console.log(user.sub.split("|")[1].toString());
+  // const { user, isAuthenticated, isLoading } = useAuth0();
+  const [user, setUser] = useState(null);
+  const [nick, setNick] = useState("");
+  // console.log(user.sub.split("|")[1].toString());
   // console.log(user);
   let navigate = useNavigate();
+
+  useEffect(() => {
+    getCurrentUser()
+      .then((user) => {
+        console.log(user);
+        setUser(user);
+        setNick(user.email.split("@")[0].toString().toUpperCase());
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    checkUser()
+      .then((res) => {
+        console.log(res);
+      })
+      .catch(() => {
+        navigate("/");
+      });
+  }, []);
+
   let movieList = [
     {
       Title: "The Avengers",
@@ -132,7 +155,7 @@ function WatchList() {
     <>
       <Navbar />
 
-      {isAuthenticated && !isLoading ? (
+      {user ? (
         <Container maxWidth="lg">
           <Box
             className="watchListHeading"
@@ -146,7 +169,7 @@ function WatchList() {
               variant="h2"
               style={{ color: "#040404", fontWeight: "bolder" }}
             >
-              {user ? user.nickname + "'S" : ""} WATCHLIST
+              {user ? nick + "'S" : ""} WATCHLIST
             </Typography>
             <Box
               style={{

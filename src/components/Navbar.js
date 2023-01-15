@@ -1,8 +1,13 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import MovieIcon from "@mui/icons-material/Movie";
 import { useNavigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
+import {
+  checkUser,
+  getCurrentUser,
+  logoutUser,
+} from "../config/firebasemethods";
 
 const Header = styled.div`
   display: flex;
@@ -34,10 +39,19 @@ const ContainerMain = styled.div`
 `;
 
 function Navbar() {
-  const { user, isAuthenticated, isLoading } = useAuth0();
+  // const { user, isAuthenticated, isLoading } = useAuth0();
+  const [user, setUser] = useState(null);
   let navigate = useNavigate();
-  const { logout } = useAuth0();
-  const { loginWithRedirect } = useAuth0();
+  // const { logout } = useAuth0();
+  // const { loginWithRedirect } = useAuth0();
+
+  useEffect(() => {
+    getCurrentUser()
+      .then((user) => {
+        setUser(user);
+      })
+      .catch((err) => console.log(err));
+  }, []);
   return (
     <>
       <ContainerMain>
@@ -60,10 +74,17 @@ function Navbar() {
               >
                 HOME
               </li>
-              {isAuthenticated ? (
+              {user ? (
                 <li
                   onClick={() => {
-                    logout();
+                    logoutUser()
+                      .then(() => {
+                        setUser(null);
+                        navigate("/");
+                      })
+                      .catch((err) => {
+                        console.log(err);
+                      });
                   }}
                   style={{
                     backgroundColor: "#FF2F2F",
@@ -77,7 +98,7 @@ function Navbar() {
               ) : (
                 <li
                   onClick={() => {
-                    loginWithRedirect();
+                    navigate("login");
                   }}
                   style={{
                     backgroundColor: "#399EFF",

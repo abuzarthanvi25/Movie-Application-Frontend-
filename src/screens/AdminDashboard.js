@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { styled, useTheme } from "@mui/material/styles";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import Box from "@mui/material/Box";
@@ -21,6 +21,7 @@ import AnalyticsIcon from "@mui/icons-material/PeopleAlt";
 import { Typography } from "@mui/material";
 import Analytics from "./Analytics";
 import { useAuth0 } from "@auth0/auth0-react";
+import { checkUser, getData, logoutUser } from "../config/firebasemethods";
 
 const drawerWidth = 240;
 
@@ -93,14 +94,16 @@ const Drawer = styled(MuiDrawer, {
 }));
 
 function AdminDashboard() {
-  const { logout } = useAuth0();
-  const { user, isAuthenticated, isLoading } = useAuth0();
-
-  console.log(user);
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
   const [auth, setAuth] = React.useState(true);
   const [anchorEl, setAnchorEl] = React.useState(null);
+
+  useEffect(() => {
+    checkUser().catch(() => {
+      navigate("/");
+    });
+  }, []);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -122,9 +125,7 @@ function AdminDashboard() {
 
   return (
     <>
-      {isAuthenticated &&
-      user.email === process.env.REACT_APP_ADMIN_EMAIL &&
-      user.nickname === process.env.REACT_APP_ADMIN_NICKNAME ? (
+      {
         <Box sx={{ display: "flex", flexGrow: 1 }}>
           <AppBar
             sx={{
@@ -182,7 +183,9 @@ function AdminDashboard() {
                   >
                     <MenuItem
                       onClick={() => {
-                        logout();
+                        logoutUser().then(() => {
+                          navigate("/");
+                        });
                       }}
                       style={{ color: "red", fontWeight: "bolder" }}
                     >
@@ -264,9 +267,7 @@ function AdminDashboard() {
             </Routes>
           </Box>
         </Box>
-      ) : (
-        navigate("/")
-      )}
+      }
     </>
   );
 }

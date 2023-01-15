@@ -294,7 +294,7 @@ function FullMovieInfo() {
         </Grid>
 
         <MovieListContainer>
-          {similarMoviesList?.length
+          {similarMoviesList?.length > 0
             ? similarMoviesList.map((movie, index) => (
                 <MovieComponent
                   key={index}

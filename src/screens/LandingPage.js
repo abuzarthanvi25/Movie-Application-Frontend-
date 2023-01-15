@@ -11,7 +11,8 @@ import { Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
-import { useAuth0 } from "@auth0/auth0-react";
+import { getCurrentUser, getData, logoutUser } from "../config/firebasemethods";
+// import { useAuth0 } from "@auth0/auth0-react";
 
 export const API_KEY = process.env.REACT_APP_API_KEY;
 
@@ -77,7 +78,8 @@ const MovieListContainer = styled.div`
 `;
 
 function LandingPage() {
-  const { loginWithRedirect, logout } = useAuth0();
+  // const { loginWithRedirect, logout } = useAuth0();
+  const [user, setUser] = useState(null);
   const [searchQuery, updateSearchQuery] = useState("");
   const [timeoutId, setTimeoutId] = useState();
   const [movieList, setMovieList] = useState();
@@ -88,8 +90,16 @@ function LandingPage() {
   const [mostPopularList, setMostPopularList] = useState([]);
   const [trendingMovieList_week, setTrendingMovieList_week] = useState([]);
   let navigate = useNavigate();
-  const { user, isAuthenticated, isLoading } = useAuth0();
-  console.log(user);
+  // const { user, isAuthenticated, isLoading } = useAuth0();
+  useEffect(() => {
+    getData("/users")
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
   const fetchData = async (searchString) => {
     const response = await axios.get(
       `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${searchString}`
@@ -141,6 +151,13 @@ function LandingPage() {
   useEffect(() => {
     getTrendingData();
     checkApi();
+    getCurrentUser()
+      .then((user) => {
+        setUser(user);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }, []);
 
   useEffect(() => {
@@ -173,7 +190,7 @@ function LandingPage() {
         </SearchBar>
         <nav>
           <ul className={activeMenu}>
-            {isAuthenticated && !isLoading ? (
+            {user ? (
               <>
                 <li
                   onClick={() => {
@@ -189,8 +206,7 @@ function LandingPage() {
                 >
                   MY WATCHLIST
                 </li>
-                {user.email === process.env.REACT_APP_ADMIN_EMAIL &&
-                user.nickname === process.env.REACT_APP_ADMIN_NICKNAME ? (
+                {user.email === process.env.REACT_APP_ADMIN_EMAIL ? (
                   <li
                     onClick={() => {
                       navigate("/dashboard");
@@ -208,7 +224,9 @@ function LandingPage() {
                 ) : null}
                 <li
                   onClick={() => {
-                    logout();
+                    logoutUser().then(() => {
+                      setUser(null);
+                    });
                   }}
                   style={{
                     backgroundColor: "#FF2F2F",
@@ -225,7 +243,7 @@ function LandingPage() {
               <>
                 <li
                   onClick={() => {
-                    loginWithRedirect();
+                    navigate(`login`);
                   }}
                   style={{
                     backgroundColor: "#399EFF",
