@@ -191,6 +191,14 @@ function AdminDashboard() {
                     >
                       LOGOUT
                     </MenuItem>
+                    <MenuItem
+                      onClick={() => {
+                        navigate("/");
+                      }}
+                      style={{ color: "red", fontWeight: "bolder" }}
+                    >
+                      HOME
+                    </MenuItem>
                   </Menu>
                 </div>
               )}
