@@ -1,11 +1,14 @@
 import { Box, Button, Typography, CircularProgress } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { signUpUser } from "../config/firebasemethods";
+import { getCurrentUser, signUpUser } from "../config/firebasemethods";
 import Link from "@mui/material/Link";
 import "../App.css";
 import HistoryEduIcon from "@mui/icons-material/HistoryEdu";
 import EZ_Input from "../components/EZ_Input";
+import axios from "axios";
+import { useDispatch } from "react-redux";
+import { setUser } from "../store/userSlice";
 
 let btnStyle = {
   padding: "10px 100px",
@@ -19,6 +22,7 @@ function SignUp() {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const dispatch = useDispatch();
 
   let signUp = () => {
     setLoading(true);
@@ -29,15 +33,32 @@ function SignUp() {
       category: "user",
     })
       .then((success) => {
-        setLoading(false);
         console.log(success);
-        alert(`Admin has been successfully registered`);
+        postCall();
+        setLoading(false);
+        alert(`User has been successfully registered`);
         navigate("/");
       })
       .catch((error) => {
         setLoading(false);
         console.log(error);
         setError(error);
+      });
+  };
+
+  const postCall = () => {
+    axios
+      .post("http://localhost:5000/users", {
+        uniqueId: Math.floor(100000 + Math.random() * 900000),
+        name: userName,
+        email: email,
+        password: password,
+      })
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => {
+        console.log(error);
       });
   };
 

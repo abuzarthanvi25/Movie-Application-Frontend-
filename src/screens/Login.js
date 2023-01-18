@@ -8,6 +8,9 @@ import React from "react";
 import "../App.css";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import EZ_Alert from "../components/EZ_Alert";
+import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
+import { setUser } from "../store/userSlice";
 
 let btnStyle = {
   padding: "10px 100px",
@@ -22,6 +25,7 @@ function Login() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [severity, setSeverity] = useState("");
+  const dispatch = useDispatch();
 
   let login = () => {
     setLoading(true);
@@ -33,16 +37,7 @@ function Login() {
         console.log(success);
         setLoading(false);
         alert(`The user ${success.userName} has been successfully signed in`);
-        // if (success.category == "admin") {
-        //   navigate("/dashboard", {
-        //     state: success,
-        //   });
-        // } else
-        // if (success.category == "user") {
-        //   navigate("/", {
-        //     state: success,
-        //   });
-        // }
+        getLoggedInUser();
         navigate("/");
       })
       .catch((err) => {
@@ -70,6 +65,21 @@ function Login() {
           setAlertMessage("");
           setSeverity("");
         }, 3000);
+      });
+  };
+
+  const getLoggedInUser = () => {
+    axios
+      .post(`http://localhost:5000/login/user`, {
+        email: email,
+        password: password,
+      })
+      .then((response) => {
+        console.log(response);
+        dispatch(setUser(response.data.data));
+      })
+      .catch((error) => {
+        console.log(error);
       });
   };
   return (

@@ -2,12 +2,7 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import MovieIcon from "@mui/icons-material/Movie";
 import { useNavigate } from "react-router-dom";
-import { useAuth0 } from "@auth0/auth0-react";
-import {
-  checkUser,
-  getCurrentUser,
-  logoutUser,
-} from "../config/firebasemethods";
+import { getCurrentUser, logoutUser } from "../config/firebasemethods";
 
 const Header = styled.div`
   display: flex;
@@ -98,7 +93,7 @@ function Navbar() {
               ) : (
                 <li
                   onClick={() => {
-                    navigate("login");
+                    navigate("/login");
                   }}
                   style={{
                     backgroundColor: "#399EFF",

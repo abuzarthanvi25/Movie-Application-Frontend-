@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import { getCurrentUser, getData, logoutUser } from "../config/firebasemethods";
+import { removeUser } from "../store/userSlice";
 // import { useAuth0 } from "@auth0/auth0-react";
 
 export const API_KEY = process.env.REACT_APP_API_KEY;
@@ -90,16 +91,6 @@ function LandingPage() {
   const [mostPopularList, setMostPopularList] = useState([]);
   const [trendingMovieList_week, setTrendingMovieList_week] = useState([]);
   let navigate = useNavigate();
-  // const { user, isAuthenticated, isLoading } = useAuth0();
-  useEffect(() => {
-    getData("/users")
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
   const fetchData = async (searchString) => {
     const response = await axios.get(
       `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${searchString}`
@@ -227,6 +218,7 @@ function LandingPage() {
                     logoutUser().then(() => {
                       setUser(null);
                     });
+                    removeUser();
                   }}
                   style={{
                     backgroundColor: "#FF2F2F",

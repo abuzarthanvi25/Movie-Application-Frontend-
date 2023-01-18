@@ -6,7 +6,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useNavigate } from "react-router-dom";
 import { Button, Grid } from "@mui/material";
 import { Box } from "@mui/system";
-import { useAuth0 } from "@auth0/auth0-react";
+import { getCurrentUser } from "../config/firebasemethods";
 
 const Container = styled.div`
   display: flex;
@@ -63,10 +63,20 @@ const Close = styled.span`
 `;
 
 function MovieInfoComponent(props) {
-  const { user, isAuthenticated, isLoading } = useAuth0();
+  const [user, setUser] = useState(null);
   const [movieInfo, setMovieInfo] = useState();
   const { selectedMovie } = props;
   let navigate = useNavigate();
+
+  useEffect(() => {
+    getCurrentUser()
+      .then((user) => {
+        setUser(user);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
 
   useEffect(() => {
     console.log(selectedMovie);
@@ -126,7 +136,7 @@ function MovieInfoComponent(props) {
                 >
                   More Info
                 </Button>
-                {isAuthenticated && user && !isLoading ? (
+                {/* {user ? (
                   <Button
                     onClick={() => {
                       console.log(movieInfo);
@@ -149,7 +159,7 @@ function MovieInfoComponent(props) {
                   >
                     Add to Watchlist
                   </Button>
-                ) : null}
+                ) : null} */}
               </Box>
             </Grid>
             <Grid

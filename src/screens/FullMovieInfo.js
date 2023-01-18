@@ -10,8 +10,10 @@ import AddIcon from "@mui/icons-material/Add";
 import { API_KEY } from "./LandingPage";
 import axios from "axios";
 import MovieInfoComponent from "../components/MovieInfoComponent";
-import { useAuth0 } from "@auth0/auth0-react";
 import Navbar from "../components/Navbar";
+import { getCurrentUser } from "../config/firebasemethods";
+import { useSelector } from "react-redux";
+import { addToWatchList } from "../store/userSlice";
 
 const ContainerMain = styled.div`
   display: flex;
@@ -52,10 +54,14 @@ const AppName = styled.div`
 
 function FullMovieInfo() {
   let location = useLocation();
+  const [user, setUser] = useState(null);
   let navigate = useNavigate();
-  const { user, isAuthenticated, isLoading } = useAuth0();
   const [similarMoviesList, setSimilarMoviesList] = useState([]);
   const [selectedMovie, onMovieSelect] = useState();
+  const userData = useSelector((state) => state.user[0]);
+  const [details, setDetails] = useState(null);
+  const [disabled, setDisabled] = useState(false);
+  // console.log(userData.watch_list);
 
   let getSimilarMovies = async () => {
     const response = await axios.get(
@@ -66,9 +72,37 @@ function FullMovieInfo() {
     setSimilarMoviesList(response.data.results);
   };
 
+  const getCurrentData = () => {
+    axios.get(`http://localhost:5000/watchlist/${userData._id}`).then((res) => {
+      console.log(res.data);
+      setDetails(res.data);
+    });
+  };
+
   useEffect(() => {
+    getCurrentUser()
+      .then((user) => {
+        setUser(user);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
     getSimilarMovies();
+    getCurrentData();
   }, []);
+
+  const patchApiCall = () => {
+    axios
+      .patch(`http://localhost:5000/watchlist/${userData._id}`, {
+        ...details,
+      })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   return (
     <ContainerMain>
@@ -92,8 +126,15 @@ function FullMovieInfo() {
               alt="none"
             />
             <div style={{ display: "flex", justifyContent: "center" }}>
-              {isAuthenticated && user && !isLoading ? (
+              {user ? (
                 <Button
+                  onClick={() => {
+                    details.watch_list.push(location.state);
+                    setDetails({ ...details });
+                    patchApiCall();
+                    setDisabled(true);
+                  }}
+                  disabled={disabled}
                   variant="contained"
                   color="warning"
                   startIcon={<AddIcon color="info" fontSize="large" />}
