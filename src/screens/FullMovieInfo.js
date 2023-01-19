@@ -10,8 +10,10 @@ import AddIcon from "@mui/icons-material/Add";
 import { API_KEY } from "./LandingPage";
 import axios from "axios";
 import MovieInfoComponent from "../components/MovieInfoComponent";
-import { useAuth0 } from "@auth0/auth0-react";
 import Navbar from "../components/Navbar";
+import { getCurrentUser } from "../config/firebasemethods";
+import { useSelector } from "react-redux";
+import { addToWatchList } from "../store/userSlice";
 
 const ContainerMain = styled.div`
   display: flex;
@@ -52,23 +54,52 @@ const AppName = styled.div`
 
 function FullMovieInfo() {
   let location = useLocation();
+  const [user, setUser] = useState(null);
   let navigate = useNavigate();
-  const { user, isAuthenticated, isLoading } = useAuth0();
   const [similarMoviesList, setSimilarMoviesList] = useState([]);
   const [selectedMovie, onMovieSelect] = useState();
+  const userData = useSelector((state) => state.user[0]);
+  const [details, setDetails] = useState(null);
+  const [disabled, setDisabled] = useState(false);
 
   let getSimilarMovies = async () => {
     const response = await axios.get(
       `https://api.themoviedb.org/3/movie/${location.state.id}/similar?api_key=${API_KEY}&language=en-US&page=1`
     );
-    // console.log(response);
-    // console.log(response.data.results);
     setSimilarMoviesList(response.data.results);
   };
 
+  const getCurrentData = () => {
+    axios.get(`http://localhost:5000/watchlist/${userData._id}`).then((res) => {
+      console.log(res.data);
+      setDetails(res.data);
+    });
+  };
+
   useEffect(() => {
+    getCurrentUser()
+      .then((user) => {
+        setUser(user);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
     getSimilarMovies();
+    getCurrentData();
   }, []);
+
+  const patchApiCall = () => {
+    axios
+      .patch(`http://localhost:5000/watchlist/${userData._id}`, {
+        ...details,
+      })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   return (
     <ContainerMain>
@@ -82,7 +113,11 @@ function FullMovieInfo() {
       )}
 
       <Container sx={{ padding: "20px" }} maxWidth="xl">
-        <Grid spacing={6} container>
+        <Grid
+          spacing={6}
+          style={{ display: "flex", flexWrap: "wrap" }}
+          container
+        >
           <Grid item md={3}>
             <img
               style={{ boxShadow: "0 3px 6px 0 #555" }}
@@ -92,11 +127,17 @@ function FullMovieInfo() {
               alt="none"
             />
             <div style={{ display: "flex", justifyContent: "center" }}>
-              {isAuthenticated && user && !isLoading ? (
+              {user ? (
                 <Button
+                  onClick={() => {
+                    details.watch_list.push(location.state);
+                    setDetails({ ...details });
+                    patchApiCall();
+                    setDisabled(true);
+                  }}
+                  disabled={disabled}
                   variant="contained"
                   color="warning"
-                  startIcon={<AddIcon color="info" fontSize="large" />}
                   sx={{
                     padding: "10px 30px",
                     marginTop: "20px",
@@ -108,7 +149,7 @@ function FullMovieInfo() {
               ) : null}
             </div>
           </Grid>
-          <Grid item md={9}>
+          <Grid item md={9} sm={12}>
             <Typography
               variant="h3"
               gutterBottom
@@ -294,7 +335,7 @@ function FullMovieInfo() {
         </Grid>
 
         <MovieListContainer>
-          {similarMoviesList?.length
+          {similarMoviesList?.length > 0
             ? similarMoviesList.map((movie, index) => (
                 <MovieComponent
                   key={index}
