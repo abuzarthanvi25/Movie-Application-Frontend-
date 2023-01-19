@@ -11,9 +11,8 @@ import { Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
-import { getCurrentUser, getData, logoutUser } from "../config/firebasemethods";
+import { getCurrentUser, logoutUser } from "../config/firebasemethods";
 import { removeUser } from "../store/userSlice";
-// import { useAuth0 } from "@auth0/auth0-react";
 
 export const API_KEY = process.env.REACT_APP_API_KEY;
 
@@ -30,10 +29,8 @@ const Header = styled.div`
   align-items: center;
   background-color: black;
   color: #f6cc38;
-  padding: 10px;
   font-size: 24px;
   font-weight: bold;
-  box-shadow: 0 3px 6px 0 #555;
   box-shadow: 0 3px 6px 0 #555;
   // box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
 `;
@@ -94,7 +91,6 @@ function LandingPage() {
   const fetchData = async (searchString) => {
     const response = await axios.get(
       `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${searchString}`
-      // `https://www.omdbapi.com/?s=${searchString}&apikey=${API_KEY}`
     );
     console.log(response);
     setMovieList(response.data.results);
@@ -123,25 +119,8 @@ function LandingPage() {
     setTimeoutId(timeout);
   };
 
-  const checkApi = async () => {
-    await fetch("http://localhost:5000/watchlist/638cdbdaf2dc70b7cd5b2292", {
-      method: "GET",
-      headers: {
-        "Content-type": "application/json; charset=UTF-8",
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-      })
-      .catch((err) => {
-        console.log(err.message);
-      });
-  };
-
   useEffect(() => {
     getTrendingData();
-    checkApi();
     getCurrentUser()
       .then((user) => {
         setUser(user);
@@ -187,13 +166,6 @@ function LandingPage() {
                   onClick={() => {
                     navigate(`watchlist`);
                   }}
-                  style={{
-                    backgroundColor: "#399EFF",
-                    color: "white",
-                    padding: "10px 30px",
-                    borderRadius: "20px",
-                    margin: "0px 10px",
-                  }}
                 >
                   MY WATCHLIST
                 </li>
@@ -203,10 +175,7 @@ function LandingPage() {
                       navigate("/dashboard");
                     }}
                     style={{
-                      backgroundColor: "#399EFF",
-                      color: "white",
-                      padding: "10px 30px",
-                      borderRadius: "20px",
+                      color: "#0069A0",
                       margin: "0px 10px",
                     }}
                   >
@@ -221,11 +190,8 @@ function LandingPage() {
                     removeUser();
                   }}
                   style={{
-                    backgroundColor: "#FF2F2F",
                     color: "white",
-                    padding: "10px 30px",
-                    borderRadius: "20px",
-                    margin: "0px 10px",
+                    backgroundColor: "red",
                   }}
                 >
                   LOGOUT
@@ -238,10 +204,7 @@ function LandingPage() {
                     navigate(`login`);
                   }}
                   style={{
-                    backgroundColor: "#399EFF",
-                    color: "white",
                     padding: "10px 30px",
-                    borderRadius: "20px",
                   }}
                 >
                   LOGIN
@@ -291,8 +254,6 @@ function LandingPage() {
           width="100%"
           height="547"
           title="Upcoming Movies"
-          // src="https://www.youtube.com/embed?listType=playlist&list=UUiCSDcAcGDvD_v0TQQ8nxJg&autoplay=1&mute=1"
-          // src="https://www.youtube.com/embed?listType=playlist&list=UUi8e0iOVk1fEOogdfu4YgfA&autoplay=1&mute=1"
           src="https://www.youtube.com/embed?listType=playlist&list=PLriZt3RmcI30yptU1kQFSwu_XIOPb6apN&autoplay=1&mute=1"
           frameBorder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -317,14 +278,7 @@ function LandingPage() {
             />
           ))
         ) : (
-          <div>
-            <Typography
-              color="primary"
-              style={{ display: "block" }}
-              variant="subtitle"
-              sx={{ textAlign: "center", color: "red" }}
-            ></Typography>
-          </div>
+          <div></div>
         )}
       </MovieListContainer>
 
@@ -376,54 +330,6 @@ function LandingPage() {
             ))
           : null}
       </MovieListContainer>
-      {/* <Typography
-        sx={{
-          fontFamily: "Bebas Neue",
-          textAlign: "left",
-          backgroundColor: "black",
-          padding: "0px 0px 0px 60px",
-        }}
-        color="error"
-        variant="h2"
-      >
-        TRENDING TV SHOWS TODAY
-      </Typography>
-
-      <MovieListContainer>
-        {trendingTV_Shows_List_day?.length
-          ? trendingTV_Shows_List_day.map((movie, index) => (
-              <MovieComponent
-                key={index}
-                movie={movie}
-                onMovieSelect={onMovieSelect}
-              />
-            ))
-          : null}
-      </MovieListContainer>
-      <Typography
-        sx={{
-          fontFamily: "Bebas Neue",
-          textAlign: "left",
-          backgroundColor: "black",
-          padding: "0px 0px 0px 60px",
-        }}
-        color="error"
-        variant="h2"
-      >
-        TRENDING TV SHOWS FOR THE WEEK
-      </Typography>
-
-      <MovieListContainer>
-        {trendingTV_Shows_List_week?.length
-          ? trendingTV_Shows_List_week.map((movie, index) => (
-              <MovieComponent
-                key={index}
-                movie={movie}
-                onMovieSelect={onMovieSelect}
-              />
-            ))
-          : null}
-      </MovieListContainer> */}
       <Typography
         sx={{
           fontFamily: "Bebas Neue",

@@ -37,7 +37,7 @@ function SignUp() {
         postCall();
         setLoading(false);
         alert(`User has been successfully registered`);
-        navigate("/");
+        navigate("/login");
       })
       .catch((error) => {
         setLoading(false);

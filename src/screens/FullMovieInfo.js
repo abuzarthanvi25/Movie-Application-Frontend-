@@ -61,14 +61,11 @@ function FullMovieInfo() {
   const userData = useSelector((state) => state.user[0]);
   const [details, setDetails] = useState(null);
   const [disabled, setDisabled] = useState(false);
-  // console.log(userData.watch_list);
 
   let getSimilarMovies = async () => {
     const response = await axios.get(
       `https://api.themoviedb.org/3/movie/${location.state.id}/similar?api_key=${API_KEY}&language=en-US&page=1`
     );
-    // console.log(response);
-    // console.log(response.data.results);
     setSimilarMoviesList(response.data.results);
   };
 
@@ -116,7 +113,11 @@ function FullMovieInfo() {
       )}
 
       <Container sx={{ padding: "20px" }} maxWidth="xl">
-        <Grid spacing={6} container>
+        <Grid
+          spacing={6}
+          style={{ display: "flex", flexWrap: "wrap" }}
+          container
+        >
           <Grid item md={3}>
             <img
               style={{ boxShadow: "0 3px 6px 0 #555" }}
@@ -137,7 +138,6 @@ function FullMovieInfo() {
                   disabled={disabled}
                   variant="contained"
                   color="warning"
-                  startIcon={<AddIcon color="info" fontSize="large" />}
                   sx={{
                     padding: "10px 30px",
                     marginTop: "20px",
@@ -149,7 +149,7 @@ function FullMovieInfo() {
               ) : null}
             </div>
           </Grid>
-          <Grid item md={9}>
+          <Grid item md={9} sm={12}>
             <Typography
               variant="h3"
               gutterBottom

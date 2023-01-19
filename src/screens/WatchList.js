@@ -2,15 +2,15 @@ import React, { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import "../App.css";
 import styled from "styled-components";
-import SearchIcon from "@mui/icons-material/Search";
-import { Typography, Container, Button } from "@mui/material";
+import { Typography, Container } from "@mui/material";
 import LockIcon from "@mui/icons-material/Lock";
 import { Box } from "@mui/system";
 import MovieComponent from "../components/MovieComponent";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { checkUser, getCurrentUser } from "../config/firebasemethods";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 
 const SearchBar = styled.div`
   display: flex;
@@ -48,9 +48,23 @@ function WatchList() {
   const [user, setUser] = useState(null);
   const [nick, setNick] = useState("");
   const userId = useSelector((state) => state.user[0]._id);
-  console.log(userId);
   const [movieList, setMovieList] = useState([]);
+  const [userDetails, setUserDetails] = useState({});
+  const userData = useSelector((state) => state.user[0]);
   let navigate = useNavigate();
+
+  const patchApiCall = () => {
+    axios
+      .patch(`http://localhost:5000/watchlist/${userData._id}`, {
+        ...userDetails,
+      })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   useEffect(() => {
     getCurrentUser()
@@ -75,7 +89,7 @@ function WatchList() {
     axios
       .get(`http://localhost:5000/watchlist/${userId}`)
       .then((res) => {
-        console.log(res);
+        setUserDetails(res.data);
         setMovieList(res.data.watch_list);
       })
       .catch((error) => {
@@ -98,8 +112,8 @@ function WatchList() {
             }}
           >
             <Typography
-              variant="h2"
-              style={{ color: "#040404", fontWeight: "bolder" }}
+              variant="h3"
+              style={{ color: "#040404", fontWeight: "bold" }}
             >
               {user ? nick + "'S" : ""} WATCHLIST
             </Typography>
@@ -127,9 +141,45 @@ function WatchList() {
             }}
             gutterBottom
           >
-            {movieList && movieList.length > 0
-              ? movieList.map((e, i) => <MovieComponent key={i} movie={e} />)
-              : null}
+            {movieList && movieList.length > 0 ? (
+              movieList.map((e, i) => (
+                <div style={{ position: "relative" }}>
+                  <MovieComponent key={i} movie={e} />
+                  <div
+                    onClick={() => {
+                      movieList.splice(i, 1);
+                      setMovieList([...movieList]);
+                      patchApiCall();
+                    }}
+                  >
+                    <RemoveCircleIcon
+                      style={{
+                        marginTop: "15px",
+                        color: "red",
+                        position: "absolute",
+                        top: "0px",
+                        right: "5px",
+                        cursor: "pointer",
+                        opacity: "0.6",
+                        fontSize: "35px",
+                      }}
+                    />
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div
+                style={{
+                  height: "100%",
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Typography variant="subtitle2">Empty</Typography>
+              </div>
+            )}
           </MovieListContainer>
         </Container>
       ) : (
