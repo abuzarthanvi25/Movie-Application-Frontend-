@@ -104,10 +104,10 @@ function Navbar() {
                     navigate("/login");
                   }}
                   style={{
-                    backgroundColor: "#399EFF",
-                    color: "white",
+                    // backgroundColor: "#399EFF",
+                    // color: "white",
                     padding: "10px 30px",
-                    borderRadius: "20px",
+                    // borderRadius: "20px",
                   }}
                 >
                   LOGIN

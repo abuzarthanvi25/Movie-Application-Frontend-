@@ -129,7 +129,7 @@ function AdminDashboard() {
         <Box sx={{ display: "flex", flexGrow: 1 }}>
           <AppBar
             sx={{
-              backgroundColor: "#003B5F",
+              backgroundColor: "#202020",
               padding: "5px",
             }}
             position="fixed"
@@ -225,7 +225,7 @@ function AdminDashboard() {
                   {
                     label: "Analytics",
                     route: "analytics",
-                    icon: <AnalyticsIcon color="primary" />,
+                    icon: <AnalyticsIcon style={{ color: "white" }} />,
                   },
                 ].map((e, i) => (
                   <ListItem
@@ -256,6 +256,7 @@ function AdminDashboard() {
                       <ListItemText
                         primary={e.label}
                         sx={{ opacity: open ? 1 : 0 }}
+                        style={{ color: "white" }}
                       />
                     </ListItemButton>
                   </ListItem>

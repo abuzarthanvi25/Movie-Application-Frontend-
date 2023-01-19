@@ -172,7 +172,7 @@ function LandingPage() {
                 {user.email === process.env.REACT_APP_ADMIN_EMAIL ? (
                   <li
                     onClick={() => {
-                      navigate("/dashboard");
+                      navigate("/dashboard/analytics");
                     }}
                     style={{
                       color: "#0069A0",

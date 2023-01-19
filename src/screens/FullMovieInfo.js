@@ -70,13 +70,19 @@ function FullMovieInfo() {
   };
 
   const getCurrentData = () => {
-    axios.get(`http://localhost:5000/watchlist/${userData._id}`).then((res) => {
-      console.log(res.data);
-      setDetails(res.data);
-    });
+    axios
+      .get(`http://localhost:5000/watchlist/${userData._id ?? null}`)
+      .then((res) => {
+        console.log(res.data);
+        setDetails(res.data);
+      });
   };
 
   useEffect(() => {
+    if (userData) {
+      getCurrentData();
+    }
+
     getCurrentUser()
       .then((user) => {
         setUser(user);
@@ -85,7 +91,7 @@ function FullMovieInfo() {
         console.log(err);
       });
     getSimilarMovies();
-    getCurrentData();
+    // getCurrentData();
   }, []);
 
   const patchApiCall = () => {
